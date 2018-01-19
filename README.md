@@ -1,2 +1,1 @@
-# dscience
-Data Science Docker image
+# Data Science Docker image
