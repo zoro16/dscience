@@ -1,30 +1,45 @@
-FROM ubuntu:16.04
+FROM alpine:3.7
 
-RUN apt-get update && apt-get install wget curl -y
-RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev llvm libncurses5-dev  libncursesw5-dev xz-utils tk-dev \
-libcupti-dev python3-numpy python3-dev python3-pip python3-wheel
+# Install glibc and useful packages
+RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+    && apk --update add \
+    bash \
+    git \
+    curl \
+    ca-certificates \
+    bzip2 \
+    unzip \
+    sudo \
+    libstdc++ \
+    glib \
+    libxext \
+    libxrender \
+    tini@testing \
+    && curl "https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub" -o /etc/apk/keys/sgerrand.rsa.pub \
+    && curl -L "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.23-r3/glibc-2.23-r3.apk" -o glibc.apk \
+    && apk add glibc.apk \
+    && curl -L "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.23-r3/glibc-bin-2.23-r3.apk" -o glibc-bin.apk \
+    && apk add glibc-bin.apk \
+    && /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc/usr/lib \
+    && rm -rf glibc*apk /var/cache/apk/*
 
-# # install python 3.6
-RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
-RUN tar xvf Python-3.6.4.tgz
-RUN cd Python-3.6.4 && ./configure && make && make install && cd ..
-RUN rm -rf Python-3.6.4.tgz
+# Configure environment
+ENV CONDA_DIR /opt/conda
+ENV PATH $CONDA_DIR/bin:$PATH
+ENV SHELL /bin/bash
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install jupyter
-RUN mkdir /root/.jupyter
-RUN echo "c.NotebookApp.ip = '*'" \
-         "\nc.NotebookApp.open_browser = False" \
-         "\nc.NotebookApp.token = ''" \
-         > /root/.jupyter/jupyter_notebook_config.py
-\
-RUN python3 -m pip install numpy pandas matplotlib \
-tensorflow h5py keras pydot ipython scipy pyconfig wheel
+# Configure Miniconda
+ENV MINICONDA_VER 4.3
+ENV MINICONDA Miniconda3-$MINICONDA_VER-Linux-x86_64.sh
+ENV MINICONDA_URL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
-## Cleanup ##
-RUN apt-get clean && apt-get autoremove 
+RUN curl -L $MINICONDA_URL  -o miniconda.sh
+RUN /bin/bash miniconda.sh -f -b -p
+RUN rm miniconda.sh
 
-
-#  docker run -p 8888:8888 --name deep01 --rm -it dscience:latest
-# we need to run "jupyter-notebook --allow-root" from inside the container
+RUN /root/miniconda3/bin/conda install --yes numpy jupyter pandas scikit-learn && \
+    tensorflow h5py keras matplotlib && \
+/root/miniconda3/bin/conda clean --yes --all

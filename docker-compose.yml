@@ -7,4 +7,4 @@ services:
       - 8888:8888
     volumes:
       - .:/usr/src/model  # map this current directory with /usr/src/api in the docker container
-    command: jupyter-notebook --allow-root
+    command: /root/miniconda3/bin/jupyter-notebook --allow-root --no-browser
