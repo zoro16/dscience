@@ -1,63 +1,29 @@
-FROM alpine:3.7
+FROM ubuntu:16.04
 
-RUN apk add --no-cache busybox \
-curl \
-gnupg \
-git \
-tar \
-openssh-client \
-make \
-alpine-sdk \
-ca-certificates \
-openssl-dev \
-curl-dev \
-readline-dev \
-sqlite-dev \
-llvm \
-ncurses-dev \
-xz-dev \
-xz \
-tk-dev \
-autoconf \
-automake \
-bzip2 \
-dpkg-dev \
-file \
-imagemagick-dev \
-bzip2-dev \
-libc-dev \
-linux-headers \
-db-dev \
-libevent-dev \
-libffi-dev \
-gdbm-dev \
-geoip-dev \
-glib-dev \
-jpeg-dev \
-krb5-dev \
-libtool \
-libunwind
+RUN apt-get update && apt-get install wget curl -y
+RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev llvm libncurses5-dev  libncursesw5-dev xz-utils tk-dev \
+libcupti-dev python3-numpy python3-dev python3-pip python3-wheel
 
-RUN apk add --no-cache python3 python3-dev && \
-    python3 -m ensurepip && \
-    rm -r /usr/lib/python*/ensurepip && \
-    pip3 install --upgrade pip setuptools && \
-    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
-    if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
-    rm -r /root/.cache
+# # install python 3.6
+RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
+RUN tar xvf Python-3.6.4.tgz
+RUN cd Python-3.6.4 && ./configure && make && make install && cd ..
+RUN rm -rf Python-3.6.4.tgz
 
-RUN pip3 install jupyter
+RUN python3 -m pip install --upgrade pip
+RUN python3 -m pip install jupyter
 RUN mkdir /root/.jupyter
 RUN echo "c.NotebookApp.ip = '*'" \
          "\nc.NotebookApp.open_browser = False" \
          "\nc.NotebookApp.token = ''" \
          > /root/.jupyter/jupyter_notebook_config.py
-
-RUN pip3 install numpy pandas matplotlib h5py keras pydot ipython scipy pyconfig wheel six
-RUN pip3 install tensorflow
+\
+RUN python3 -m pip install numpy pandas matplotlib \
+tensorflow h5py keras pydot ipython scipy pyconfig wheel
 
 ## Cleanup ##
-RUN rm -rf /var/cache/apk/*
+RUN apt-get clean && apt-get autoremove 
 
 
 #  docker run -p 8888:8888 --name deep01 --rm -it dscience:latest
