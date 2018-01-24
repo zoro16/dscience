@@ -26,5 +26,6 @@ tensorflow h5py keras pydot ipython scipy pyconfig
 RUN apt-get clean && apt-get autoclean && apt-get autoremove 
 RUN apt-get purge lib*-dev build-essential -y
 
+ENTRYPOINT ["bash", "http://0.0.0.0:8888"]
 #  docker run -p 8888:8888 --name deep01 --rm -it dscience:latest
 # we need to run "jupyter-notebook --allow-root" from inside the container
