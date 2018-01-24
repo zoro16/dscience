@@ -20,11 +20,11 @@ RUN echo "c.NotebookApp.ip = '*'" \
          > /root/.jupyter/jupyter_notebook_config.py
 \
 RUN python3 -m pip install numpy pandas matplotlib \
-tensorflow h5py keras pydot ipython scipy pyconfig wheel
+tensorflow h5py keras pydot ipython scipy pyconfig
 
 ## Cleanup ##
-RUN apt-get clean && apt-get autoremove 
-
+RUN apt-get clean && apt-get autoclean && apt-get autoremove 
+RUN apt-get purge lib*-dev build-essential -y
 
 #  docker run -p 8888:8888 --name deep01 --rm -it dscience:latest
 # we need to run "jupyter-notebook --allow-root" from inside the container
