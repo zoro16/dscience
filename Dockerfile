@@ -6,10 +6,15 @@ libreadline-dev libsqlite3-dev llvm libncurses5-dev  libncursesw5-dev xz-utils t
 libcupti-dev python3-numpy python3-dev python3-pip python3-wheel
 
 # install python 3.6
-RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:jonathonf/python-3.6 -y \
-&&  apt-get update -y \
-&& apt-get install python3.6 -y
+RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
+RUN tar xvf Python-3.6.4.tgz
+RUN cd Python-3.6.4 && ./configure && make && make install && cd ..
+RUN rm -rf Python-3.6.4.tgz
+
+# RUN apt-get install software-properties-common -y
+# RUN add-apt-repository ppa:jonathonf/python-3.6 -y\
+# &&  apt-get update -y\
+# &&  apt-get install python3.6 -y
 
 
 RUN python3.6 -m pip install --upgrade pip
@@ -21,7 +26,7 @@ RUN echo "c.NotebookApp.ip = '*'" \
          > /root/.jupyter/jupyter_notebook_config.py
 \
 RUN python3.6 -m pip install numpy pandas matplotlib \
-tensorflow h5py keras pydot ipython scipy pyconfig
+tensorflow h5py keras pydot ipython scipy pyconfig music21 librosa
 
 ## Cleanup ##
 RUN apt-get clean && apt-get autoclean && apt-get autoremove 
