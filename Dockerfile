@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 RUN apt-get update && apt-get install wget curl -y
 RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev llvm libncurses5-dev  libncursesw5-dev xz-utils tk-dev \
-libcupti-dev python3-numpy python3-dev python3-pip python3-wheel
+libcupti-dev python3-numpy python3-dev python3-pip python3-wheel ffmpeg
 
 # install python 3.6
 RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
@@ -26,7 +26,8 @@ RUN echo "c.NotebookApp.ip = '*'" \
          > /root/.jupyter/jupyter_notebook_config.py
 \
 RUN python3.6 -m pip install numpy pandas matplotlib \
-tensorflow h5py keras pydot ipython scipy pyconfig music21 librosa
+tensorflow h5py keras pydot ipython scipy pyconfig music21 librosa \
+faker tqdm babel pydub
 
 ## Cleanup ##
 RUN apt-get clean && apt-get autoclean && apt-get autoremove 
