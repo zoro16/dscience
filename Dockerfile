@@ -1,75 +1,26 @@
 FROM ubuntu:16.04
+MAINTAINER Guy Taylor <thebigguy.co.uk@gmail.com>
 
-RUN apt-get update
-RUN apt-get install -y pulseaudio-utils \
-    wget \
-    curl \
-    make \
-    build-essential \
-    gcc \
-    g++ \
-    libjack-jackd2-dev \
-    portaudio19-dev \
-    unzip \
-    libssl-dev \
-    zlib1g-dev \
-    libbz2-dev \
-    libreadline-dev \
-    libsqlite3-dev \
-    llvm \
-    libncurses5-dev \
-    libncursesw5-dev \
-    xz-utils \
-    tk-dev \
-    libcupti-dev \
-    python3-numpy \
-    python3-dev \
-    python3-pip \
-    python3-wheel \
-    ffmpeg
+ENV UNAME pacat
 
-# install python 3.6
-RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
-RUN tar xvf Python-3.6.4.tgz
-RUN cd Python-3.6.4 && ./configure && make && make install && cd ..
-RUN rm -rf Python-3.6.4.tgz
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install --yes pulseaudio-utils
 
-RUN python3.6 -m pip install --upgrade pip
-RUN python3.6 -m pip install jupyter
-RUN mkdir /root/.jupyter
-RUN echo "c.NotebookApp.ip = '*'" \
-         "\nc.NotebookApp.open_browser = False" \
-         "\nc.NotebookApp.token = ''" \
-         > /root/.jupyter/jupyter_notebook_config.py
+# Set up the user
+RUN export UNAME=$UNAME UID=1000 GID=1000 && \
+    mkdir -p "/home/${UNAME}" && \
+    echo "${UNAME}:x:${UID}:${GID}:${UNAME} User,,,:/home/${UNAME}:/bin/bash" >> /etc/passwd && \
+    echo "${UNAME}:x:${UID}:" >> /etc/group && \
+    mkdir -p /etc/sudoers.d && \
+    echo "${UNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${UNAME} && \
+    chmod 0440 /etc/sudoers.d/${UNAME} && \
+    chown ${UID}:${GID} -R /home/${UNAME} && \
+    gpasswd -a ${UNAME} audio
 
-RUN python3.6 -m pip install numpy \
-    pandas \
-    matplotlib \
-    tensorflow \
-    h5py \
-    keras \
-    pydot \
-    ipython \
-    scipy \
-    pyconfig \
-    music21 \
-    librosa \
-    faker \
-    tqdm \
-    babel \
-    pydub \
-    pyaudio \
-    six \
-    resampy \
-    pillow \
-    ipykernel
+COPY pulse-client.conf /etc/pulse/client.conf
 
-RUN python3.6 -m ipykernel.kernelspec
+USER $UNAME
+ENV HOME /home/pacat
 
-## Cleanup ##
-RUN apt-get clean && apt-get autoclean && apt-get autoremove 
-RUN apt-get purge lib*-dev build-essential -y
-
-# ENTRYPOINT ["bash", "http://0.0.0.0:8888"]
-#  docker run -p 8888:8888 --name deep01 --rm -it dscience:latest
-# we need to run "jupyter-notebook --allow-root" from inside the container
+# run
+CMD ["pacat", "-vvvv", "/dev/urandom"]
