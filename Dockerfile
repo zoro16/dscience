@@ -1,5 +1,4 @@
 FROM ubuntu:16.04
-MAINTAINER Guy Taylor <thebigguy.co.uk@gmail.com>
 
 ENV UNAME pacat
 
