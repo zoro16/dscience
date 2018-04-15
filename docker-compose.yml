@@ -5,6 +5,8 @@ services:
     image: zoro1666/dscience
     ports:
       - 8888:8888
+      - 6006:6006
+      - 7007:7007
     volumes:
-      - .:/model  # map this current directory with /usr/src/api in the docker container
+      - .:/models
     command: jupyter-notebook --allow-root
