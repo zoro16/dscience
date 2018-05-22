@@ -26,7 +26,9 @@ RUN apt-get install -y pulseaudio-utils \
     python3-dev \
     python3-pip \
     python3-wheel \
-    ffmpeg
+    ffmpeg \
+    rar \
+    unrar
 
 # install python 3.6
 RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
@@ -46,6 +48,7 @@ RUN python3.6 -m pip install numpy \
     pandas \
     matplotlib \
     tensorflow \
+    tensorflow-hub \
     h5py \
     keras \
     pydot \
@@ -62,7 +65,8 @@ RUN python3.6 -m pip install numpy \
     six \
     resampy \
     pillow \
-    ipykernel
+    ipykernel \
+    Image
 
 RUN python3.6 -m ipykernel.kernelspec
 
