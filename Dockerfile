@@ -30,11 +30,13 @@ RUN apt-get install -y pulseaudio-utils \
     rar \
     unrar
 
-# install python 3.6
-RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
-RUN tar xvf Python-3.6.4.tgz
-RUN cd Python-3.6.4 && ./configure && make && make install && cd ..
-RUN rm -rf Python-3.6.4.tgz
+# INSTALL PYTHON 3.6
+ARG PYTHON_VERSION=3.6.4
+
+RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
+RUN tar xvf Python-$PYTHON_VERSION.tgz
+RUN cd Python-$PYTHON_VERSION && ./configure && make && make install && cd ..
+RUN rm -rf Python-$PYTHON_VERSION.tgz
 
 RUN python3.6 -m pip install --upgrade pip
 RUN python3.6 -m pip install jupyter
@@ -70,7 +72,7 @@ RUN python3.6 -m pip install numpy \
 
 RUN python3.6 -m ipykernel.kernelspec
 
-## Cleanup ##
+# CLEANUP
 RUN apt-get clean && apt-get autoclean && apt-get autoremove 
 RUN apt-get purge lib*-dev build-essential -y
 
